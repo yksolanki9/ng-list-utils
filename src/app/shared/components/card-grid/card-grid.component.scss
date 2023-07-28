@@ -3,13 +3,14 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin: 24px;
+  grid-auto-rows: max-content; 
 }
 
 .grid-item {
   background-color: #f0f0f0;
-  padding: 20px;
+  padding: 12px;
   text-align: center;
-  height: 200px;
+  border-radius: 8px;
 }
 
 @media screen and (max-width: 1024px) {
