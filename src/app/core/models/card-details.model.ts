@@ -1,5 +1,5 @@
 export interface CardDetails {
-  title: string;
+  name: string;
   description: string;
   image: string;
   dateLastEdited: string;
