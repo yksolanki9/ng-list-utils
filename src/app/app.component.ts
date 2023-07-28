@@ -44,15 +44,15 @@ export class AppComponent {
 
   getData(): Observable<CardDetails[]> {
     return this.dataService.getData().pipe(
-      map((data) =>
-        data.map((row) => ({
-          ...row,
-          dateLastEdited: this.datePipe.transform(
-            row.dateLastEdited,
-            'mediumDate'
-          ),
-        }))
-      ),
+      // map((data) =>
+      //   data.map((row) => ({
+      //     ...row,
+      //     dateLastEdited: this.datePipe.transform(
+      //       row.dateLastEdited,
+      //       'mediumDate'
+      //     ),
+      //   }))
+      // ),
       shareReplay(1)
     );
   }
@@ -69,9 +69,12 @@ export class AppComponent {
     }
 
     if (filters.sort) {
-      data.sort((val1, val2) =>
-        val1[filters.sort] > val2[filters.sort] ? 1 : -1
-      );
+      const [sortField, sortDirection] = filters.sort.split('-');
+      if (sortDirection === 'asc') {
+        data.sort((val1, val2) => (val1[sortField] > val2[sortField] ? 1 : -1));
+      } else if (sortDirection === 'desc') {
+        data.sort((val1, val2) => (val1[sortField] < val2[sortField] ? 1 : -1));
+      }
     }
 
     return data;
