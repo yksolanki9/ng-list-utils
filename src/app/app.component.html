@@ -16,10 +16,10 @@
       <input formControlName="page" type="number" min="1" value="1"/>
     </div>
   </div>
-  <ng-container *ngIf="filteredData$ | async as filteredData">
-    <app-card-grid [dataSource]="filteredData"></app-card-grid>
+  <ng-container *ngIf="paginatedData$ | async as paginatedData">
+    <app-card-grid [dataSource]="paginatedData"></app-card-grid>
   </ng-container>
-  <div class="table-container">
-    <app-table [dataSource]="dataSource"></app-table>
+  <div *ngIf="filteredData$ | async as filteredData" class="table-container">
+    <app-table [dataSource]="filteredData"></app-table>
   </div>
 </div>

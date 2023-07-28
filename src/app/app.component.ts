@@ -5,6 +5,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import {
   debounceTime,
   distinctUntilChanged,
+  distinctUntilKeyChanged,
   map,
   shareReplay,
 } from 'rxjs/operators';
@@ -40,6 +41,12 @@ export class AppComponent {
 
   filteredData$: Observable<CardDetails[]>;
 
+  paginatedData$: Observable<CardDetails[]>;
+
+  PAGE_SIZE = 6;
+
+  pageNumber = 1;
+
   constructor(
     private dataService: DataService,
     private dateService: DateService
@@ -72,6 +79,16 @@ export class AppComponent {
     return data;
   }
 
+  paginateData(data: CardDetails[], filters: Partial<Filters>): CardDetails[] {
+    if (filters.page) {
+      const start = (filters.page - 1) * this.PAGE_SIZE;
+      const end = start + this.PAGE_SIZE;
+      return data.slice(start, end);
+    }
+
+    return data.slice(0, this.PAGE_SIZE);
+  }
+
   ngOnInit() {
     this.getData().subscribe((data) => (this.dataSource = data));
 
@@ -92,6 +109,10 @@ export class AppComponent {
       )
     );
 
+    const paginationFilters$ = this.filters$.pipe(
+      distinctUntilKeyChanged('page')
+    );
+
     this.filteredData$ = combineLatest({
       data: this.getData(),
       filters: searchAndSortFilters$,
@@ -100,5 +121,10 @@ export class AppComponent {
       map((filteredData) => this.dateService.formatDate(filteredData)),
       shareReplay(1)
     );
+
+    this.paginatedData$ = combineLatest({
+      data: this.filteredData$,
+      filters: paginationFilters$,
+    }).pipe(map(({ data, filters }) => this.paginateData(data, filters)));
   }
 }
