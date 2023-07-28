@@ -1,0 +1,12 @@
+<table *ngIf="dataArray?.length">
+  <thead>
+    <tr>
+      <th *ngFor="let header of tableHeaders">{{header | titlecase}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of dataArray">
+      <td *ngFor="let data of row"> {{ data }} </td>
+    </tr>
+  </tbody>
+</table>
