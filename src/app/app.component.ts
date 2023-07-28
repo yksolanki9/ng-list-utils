@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { DataService } from './core/services/data.service';
 import { CardDetails } from './core/models/card-details.model';
-import { DatePipe } from '@angular/common';
 import { FormControl, FormGroup } from '@angular/forms';
 import {
   debounceTime,
@@ -11,6 +10,7 @@ import {
 } from 'rxjs/operators';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 import { Filters } from './core/models/filters.model';
+import { DateService } from './core/services/date.service';
 
 type FiltersForm = {
   search: FormControl<string>;
@@ -40,21 +40,13 @@ export class AppComponent {
 
   filteredData$: Observable<CardDetails[]>;
 
-  constructor(private dataService: DataService, private datePipe: DatePipe) {}
+  constructor(
+    private dataService: DataService,
+    private dateService: DateService
+  ) {}
 
   getData(): Observable<CardDetails[]> {
-    return this.dataService.getData().pipe(
-      // map((data) =>
-      //   data.map((row) => ({
-      //     ...row,
-      //     dateLastEdited: this.datePipe.transform(
-      //       row.dateLastEdited,
-      //       'mediumDate'
-      //     ),
-      //   }))
-      // ),
-      shareReplay(1)
-    );
+    return this.dataService.getData().pipe(shareReplay(1));
   }
 
   filterData(data: CardDetails[], filters: Partial<Filters>): CardDetails[] {
@@ -100,11 +92,13 @@ export class AppComponent {
       )
     );
 
-    combineLatest({
+    this.filteredData$ = combineLatest({
       data: this.getData(),
       filters: searchAndSortFilters$,
-    })
-      .pipe(map(({ data, filters }) => this.filterData(data, filters)))
-      .subscribe((data) => console.log('DATA IS', data));
+    }).pipe(
+      map(({ data, filters }) => this.filterData(data, filters)),
+      map((filteredData) => this.dateService.formatDate(filteredData)),
+      shareReplay(1)
+    );
   }
 }

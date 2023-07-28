@@ -16,7 +16,9 @@
       <input formControlName="page" type="number" min="1" value="1"/>
     </div>
   </div>
-  <app-card-grid [dataSource]="dataSource"></app-card-grid>
+  <ng-container *ngIf="filteredData$ | async as filteredData">
+    <app-card-grid [dataSource]="filteredData"></app-card-grid>
+  </ng-container>
   <div class="table-container">
     <app-table [dataSource]="dataSource"></app-table>
   </div>

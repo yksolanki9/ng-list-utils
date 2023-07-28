@@ -1,5 +1,5 @@
 <div class="grid-container">
   <ng-container *ngFor="let data of dataSource">
-    <app-card [title]="data.name" [description]="data.description" [imageUrl]="data.image" class="grid-item"></app-card>
+    <app-card [title]="data.name" [description]="data.description" [imageUrl]="data.image" [updatedAt]="data.dateLastEdited" class="grid-item"></app-card>
   </ng-container>
 </div>
