@@ -1,17 +1,17 @@
 <div class="content">
   <h1>Dashboard</h1>
-  <div class="controls-block">
-    <input placeholder="Search"/>
+  <div [formGroup]="filterForm" class="controls-block">
+    <input formControlName="search" placeholder="Search"/>
     <div>
       <label for="sort-by">Sort By: </label>
-      <select name="sort-by" id="sort-by">
+      <select formControlName="sort" name="sort-by" id="sort-by">
         <option value="name">Name</option>
         <option value="date-last-edited">Date Last Edited</option>
       </select>
     </div>
     <div>
       Go to page:
-      <input type="number" min="1" value="1"/>
+      <input formControlName="page" type="number" min="1" value="1"/>
     </div>
   </div>
   <app-card-grid [dataSource]="dataSource"></app-card-grid>
