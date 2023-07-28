@@ -4,7 +4,7 @@ import { CardDetails } from 'src/app/core/models/card-details.model';
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
-  styleUrls: ['./table.component.scss']
+  styleUrls: ['./table.component.scss'],
 })
 export class TableComponent {
   @Input() dataSource: CardDetails[];
@@ -14,7 +14,7 @@ export class TableComponent {
   tableHeaders: string[];
 
   ngOnChanges(changes: SimpleChanges) {
-    if(changes['dataSource']?.currentValue?.length) {
+    if (changes['dataSource']?.currentValue?.length) {
       this.tableHeaders = Object.keys(changes['dataSource'].currentValue[0]);
       this.dataArray = this.dataSource.map((row) => Object.values(row));
     }

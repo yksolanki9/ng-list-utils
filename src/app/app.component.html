@@ -1,25 +1,33 @@
 <div class="content">
   <h1>Dashboard</h1>
-  <div [formGroup]="filterForm" class="controls-block">
-    <input formControlName="search" placeholder="Search"/>
-    <div>
-      <label for="sort-by">Sort By: </label>
-      <select formControlName="sort" name="sort-by" id="sort-by">
-        <option value="name-asc">Name (Ascending)</option>
-        <option value="name-desc">Name (Descending)</option>
-        <option value="dateLastEdited-asc">Date Last Edited (Ascending)</option>
-        <option value="dateLastEdited-desc">Date Last Edited (Descending)</option>
-      </select>
+  <div class="controls-block">
+    <div [formGroup]="filterForm">
+      <input formControlName="search" placeholder="Search"/>
+      <div>
+        <label for="sort-by">Sort By: </label>
+        <select formControlName="sort" name="sort-by" id="sort-by">
+          <option value="name-asc">Name (Ascending)</option>
+          <option value="name-desc">Name (Descending)</option>
+          <option value="dateLastEdited-asc">Date Last Edited (Ascending)</option>
+          <option value="dateLastEdited-desc">Date Last Edited (Descending)</option>
+        </select>
+      </div>
     </div>
-    <div>
-      Go to page:
-      <input formControlName="page" type="number" min="1" value="1"/>
+    <div [formGroup]="paginationForm">
+      <div>
+        Page Size:
+        <input formControlName="pageSize" type="number" min="1"/>
+      </div>
+      <div>
+        Go to page:
+        <input formControlName="pageNumber" type="number" min="1"/>
+      </div>
     </div>
   </div>
   <ng-container *ngIf="paginatedData$ | async as paginatedData">
-    <app-card-grid [dataSource]="paginatedData"></app-card-grid>
+    <app-card-grid *ngIf="paginatedData.length" [dataSource]="paginatedData"></app-card-grid>
   </ng-container>
   <div *ngIf="filteredData$ | async as filteredData" class="table-container">
-    <app-table [dataSource]="filteredData"></app-table>
+    <app-table *ngIf="filteredData.length" [dataSource]="filteredData"></app-table>
   </div>
 </div>

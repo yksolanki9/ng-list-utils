@@ -2,21 +2,20 @@ import { Component } from '@angular/core';
 import { DataService } from './core/services/data.service';
 import { CardDetails } from './core/models/card-details.model';
 import { FormControl, FormGroup } from '@angular/forms';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  distinctUntilKeyChanged,
-  map,
-  shareReplay,
-} from 'rxjs/operators';
+import { debounceTime, map, shareReplay } from 'rxjs/operators';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 import { Filters } from './core/models/filters.model';
 import { DateService } from './core/services/date.service';
+import { PaginationConfig } from './core/models/pagination-config.model';
 
 type FiltersForm = {
   search: FormControl<string>;
   sort: FormControl<string>;
-  page: FormControl<number>;
+};
+
+type PaginationForm = {
+  pageSize: FormControl<number>;
+  pageNumber: FormControl<number>;
 };
 
 @Component({
@@ -33,19 +32,21 @@ export class AppComponent {
 
   filterForm: FormGroup<FiltersForm>;
 
+  paginationForm: FormGroup<PaginationForm>;
+
   filters$ = new BehaviorSubject<Partial<Filters>>({
     search: null,
     sort: null,
-    page: null,
+  });
+
+  paginationConfig$ = new BehaviorSubject<Partial<PaginationConfig>>({
+    pageSize: 6,
+    pageNumber: 1,
   });
 
   filteredData$: Observable<CardDetails[]>;
 
   paginatedData$: Observable<CardDetails[]>;
-
-  PAGE_SIZE = 6;
-
-  pageNumber = 1;
 
   constructor(
     private dataService: DataService,
@@ -79,14 +80,18 @@ export class AppComponent {
     return data;
   }
 
-  paginateData(data: CardDetails[], filters: Partial<Filters>): CardDetails[] {
-    if (filters.page) {
-      const start = (filters.page - 1) * this.PAGE_SIZE;
-      const end = start + this.PAGE_SIZE;
+  paginateData(
+    data: CardDetails[],
+    config: Partial<PaginationConfig>
+  ): CardDetails[] {
+    const pageSize = config.pageSize || 6;
+    if (config.pageNumber) {
+      const start = (config.pageNumber - 1) * pageSize;
+      const end = start + pageSize;
       return data.slice(start, end);
     }
 
-    return data.slice(0, this.PAGE_SIZE);
+    return data.slice(0, pageSize);
   }
 
   ngOnInit() {
@@ -95,27 +100,24 @@ export class AppComponent {
     this.filterForm = new FormGroup<FiltersForm>({
       search: new FormControl(),
       sort: new FormControl(),
-      page: new FormControl(),
     });
 
-    this.filterForm.valueChanges.subscribe((val) => {
+    this.paginationForm = new FormGroup<PaginationForm>({
+      pageSize: new FormControl(6),
+      pageNumber: new FormControl(1),
+    });
+
+    this.filterForm.valueChanges.pipe(debounceTime(300)).subscribe((val) => {
       this.filters$.next(val);
     });
 
-    const searchAndSortFilters$ = this.filters$.pipe(
-      debounceTime(300),
-      distinctUntilChanged(
-        (prev, curr) => prev.search === curr.search && prev.sort === curr.sort
-      )
-    );
-
-    const paginationFilters$ = this.filters$.pipe(
-      distinctUntilKeyChanged('page')
-    );
+    this.paginationForm.valueChanges.subscribe((val) => {
+      this.paginationConfig$.next(val);
+    });
 
     this.filteredData$ = combineLatest({
       data: this.getData(),
-      filters: searchAndSortFilters$,
+      filters: this.filters$,
     }).pipe(
       map(({ data, filters }) => this.filterData(data, filters)),
       map((filteredData) => this.dateService.formatDate(filteredData)),
@@ -124,7 +126,7 @@ export class AppComponent {
 
     this.paginatedData$ = combineLatest({
       data: this.filteredData$,
-      filters: paginationFilters$,
-    }).pipe(map(({ data, filters }) => this.paginateData(data, filters)));
+      config: this.paginationConfig$,
+    }).pipe(map(({ data, config }) => this.paginateData(data, config)));
   }
 }
