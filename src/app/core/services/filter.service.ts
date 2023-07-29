@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { CardDetails } from '../models/card-details.model';
-import { PaginationConfig } from '../models/pagination-config.model';
 
 @Injectable({
   providedIn: 'root',
@@ -41,15 +40,16 @@ export class FilterService {
 
   paginate(
     data: CardDetails[],
-    config: Partial<PaginationConfig>
+    pageSize: number,
+    pageNumber: number
   ): CardDetails[] {
-    const pageSize = config.pageSize || 6;
-    if (config.pageNumber) {
-      const start = (config.pageNumber - 1) * pageSize;
-      const end = start + pageSize;
+    const PAGE_SIZE = pageSize || 6;
+    if (pageNumber) {
+      const start = (pageNumber - 1) * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
       return data.slice(start, end);
     }
 
-    return data.slice(0, pageSize);
+    return data.slice(0, PAGE_SIZE);
   }
 }

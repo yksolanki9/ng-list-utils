@@ -2,19 +2,21 @@ import { Component } from '@angular/core';
 import { DataService } from './core/services/data.service';
 import { CardDetails } from './core/models/card-details.model';
 import { FormControl, FormGroup } from '@angular/forms';
-import { debounceTime, map, shareReplay } from 'rxjs/operators';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  shareReplay,
+} from 'rxjs/operators';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { Filters } from './core/models/filters.model';
+import { FiltersWithPageConfig } from './core/models/filters.model';
 import { DateService } from './core/services/date.service';
-import { PaginationConfig } from './core/models/pagination-config.model';
 import { FilterService } from './core/services/filter.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
-type FiltersForm = {
+type FiltersWithPageForm = {
   search: FormControl<string>;
   sort: FormControl<string>;
-};
-
-type PaginationForm = {
   pageSize: FormControl<number>;
   pageNumber: FormControl<number>;
 };
@@ -27,16 +29,11 @@ type PaginationForm = {
 export class AppComponent {
   tableHeaders: string[];
 
-  filterForm: FormGroup<FiltersForm>;
+  filtersWithPageForm: FormGroup<FiltersWithPageForm>;
 
-  paginationForm: FormGroup<PaginationForm>;
-
-  filters$ = new BehaviorSubject<Partial<Filters>>({
+  filtersWithPageConfig$ = new BehaviorSubject<Partial<FiltersWithPageConfig>>({
     search: null,
     sort: null,
-  });
-
-  paginationConfig$ = new BehaviorSubject<Partial<PaginationConfig>>({
     pageSize: 6,
     pageNumber: 1,
   });
@@ -48,7 +45,9 @@ export class AppComponent {
   constructor(
     private dataService: DataService,
     private dateService: DateService,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   private getData(): Observable<CardDetails[]> {
@@ -57,7 +56,7 @@ export class AppComponent {
 
   private filterData(
     data: CardDetails[],
-    filters: Partial<Filters>
+    filters: Partial<FiltersWithPageConfig>
   ): CardDetails[] {
     if (filters.search) {
       data = this.filterService.search(data, filters.search);
@@ -73,38 +72,56 @@ export class AppComponent {
   ngOnInit() {
     this.tableHeaders = this.dataService.getTableHeaders();
 
-    this.filterForm = new FormGroup<FiltersForm>({
-      search: new FormControl(),
-      sort: new FormControl(),
+    this.route.queryParams.subscribe((queryParams) => {
+      this.filtersWithPageConfig$.next(queryParams);
     });
 
-    this.paginationForm = new FormGroup<PaginationForm>({
+    this.filtersWithPageForm = new FormGroup<FiltersWithPageForm>({
+      search: new FormControl(),
+      sort: new FormControl(),
       pageSize: new FormControl(6),
       pageNumber: new FormControl(1),
     });
 
-    this.filterForm.valueChanges.pipe(debounceTime(300)).subscribe((val) => {
-      this.filters$.next(val);
-    });
+    this.filtersWithPageForm.valueChanges
+      .pipe(debounceTime(300))
+      .subscribe((filters) => {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: filters,
+          queryParamsHandling: 'merge',
+        });
+      });
 
-    this.paginationForm.valueChanges.subscribe((val) => {
-      this.paginationConfig$.next(val);
-    });
+    const searchAndSortFilters$ = this.filtersWithPageConfig$.pipe(
+      distinctUntilChanged(
+        (prev, curr) => prev.search === curr.search && prev.sort === curr.sort
+      )
+    );
 
     this.filteredData$ = combineLatest({
       data: this.getData(),
-      filters: this.filters$,
+      filters: searchAndSortFilters$,
     }).pipe(
       map(({ data, filters }) => this.filterData(data, filters)),
       map((filteredData) => this.dateService.formatDate(filteredData)),
       shareReplay(1)
     );
 
+    const paginationConfig$ = this.filtersWithPageConfig$.pipe(
+      distinctUntilChanged(
+        (prev, curr) =>
+          prev.pageSize === curr.pageSize && prev.pageNumber === curr.pageNumber
+      )
+    );
+
     this.paginatedData$ = combineLatest({
       data: this.filteredData$,
-      config: this.paginationConfig$,
+      config: paginationConfig$,
     }).pipe(
-      map(({ data, config }) => this.filterService.paginate(data, config))
+      map(({ data, config }) =>
+        this.filterService.paginate(data, config.pageSize, config.pageNumber)
+      )
     );
   }
 }

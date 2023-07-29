@@ -1,7 +1,7 @@
 <div class="content">
   <h1>Dashboard</h1>
   <div class="controls-block">
-    <div [formGroup]="filterForm">
+    <div [formGroup]="filtersWithPageForm">
       <input formControlName="search" placeholder="Search"/>
       <div>
         <label for="sort-by">Sort By: </label>
@@ -12,8 +12,6 @@
           <option value="dateLastEdited-desc">Date Last Edited (Descending)</option>
         </select>
       </div>
-    </div>
-    <div [formGroup]="paginationForm">
       <div>
         Page Size:
         <input formControlName="pageSize" type="number" min="1"/>
