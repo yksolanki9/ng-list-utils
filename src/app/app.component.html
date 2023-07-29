@@ -28,6 +28,6 @@
     <app-card-grid *ngIf="paginatedData.length" [dataSource]="paginatedData"></app-card-grid>
   </ng-container>
   <div *ngIf="filteredData$ | async as filteredData" class="table-container">
-    <app-table *ngIf="filteredData.length" [dataSource]="filteredData"></app-table>
+    <app-table *ngIf="filteredData.length" [dataSource]="filteredData" [tableHeaders]="tableHeaders"></app-table>
   </div>
 </div>

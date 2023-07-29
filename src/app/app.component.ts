@@ -25,11 +25,7 @@ type PaginationForm = {
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  dataSource: CardDetails[];
-
-  tableHeaders: CardDetails;
-
-  searchString: string;
+  tableHeaders: string[];
 
   filterForm: FormGroup<FiltersForm>;
 
@@ -75,7 +71,7 @@ export class AppComponent {
   }
 
   ngOnInit() {
-    this.getData().subscribe((data) => (this.dataSource = data));
+    this.tableHeaders = this.dataService.getTableHeaders();
 
     this.filterForm = new FormGroup<FiltersForm>({
       search: new FormControl(),

@@ -4,13 +4,16 @@ import { CardDetails } from '../models/card-details.model';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DataService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getData(): Observable<CardDetails[]> {
     return this.http.get<CardDetails[]>('assets/data/data.json');
-  } 
+  }
+
+  getTableHeaders(): string[] {
+    return ['Name', 'Image URL', 'Description', 'Updated At'];
+  }
 }

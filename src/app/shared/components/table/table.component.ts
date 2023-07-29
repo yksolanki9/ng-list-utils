@@ -9,13 +9,12 @@ import { CardDetails } from 'src/app/core/models/card-details.model';
 export class TableComponent {
   @Input() dataSource: CardDetails[];
 
-  dataArray: string[][];
+  @Input() tableHeaders: string[];
 
-  tableHeaders: string[];
+  dataArray: string[][];
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['dataSource']?.currentValue?.length) {
-      this.tableHeaders = Object.keys(changes['dataSource'].currentValue[0]);
       this.dataArray = this.dataSource.map((row) => Object.values(row));
     }
   }
