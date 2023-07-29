@@ -7,6 +7,7 @@ import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 import { Filters } from './core/models/filters.model';
 import { DateService } from './core/services/date.service';
 import { PaginationConfig } from './core/models/pagination-config.model';
+import { FilterService } from './core/services/filter.service';
 
 type FiltersForm = {
   search: FormControl<string>;
@@ -50,54 +51,27 @@ export class AppComponent {
 
   constructor(
     private dataService: DataService,
-    private dateService: DateService
+    private dateService: DateService,
+    private filterService: FilterService
   ) {}
 
-  getData(): Observable<CardDetails[]> {
+  private getData(): Observable<CardDetails[]> {
     return this.dataService.getData().pipe(shareReplay(1));
   }
 
-  filterData(data: CardDetails[], filters: Partial<Filters>): CardDetails[] {
+  private filterData(
+    data: CardDetails[],
+    filters: Partial<Filters>
+  ): CardDetails[] {
     if (filters.search) {
-      const exactSearchRegex = new RegExp('^"(.*)"$');
-      const searchString = exactSearchRegex.exec(filters.search);
-      let searchRegex: RegExp;
-      if (searchString) {
-        //Exact Match
-        searchRegex = new RegExp(searchString[1], 'i');
-      } else {
-        //Non exact match
-        searchRegex = new RegExp(filters.search.split(' ').join('.*'), 'i');
-      }
-      data = data.filter((row) => {
-        return searchRegex.test(row.name) || searchRegex.test(row.description);
-      });
+      data = this.filterService.search(data, filters.search);
     }
 
     if (filters.sort) {
-      const [sortField, sortDirection] = filters.sort.split('-');
-      if (sortDirection === 'asc') {
-        data.sort((val1, val2) => (val1[sortField] > val2[sortField] ? 1 : -1));
-      } else if (sortDirection === 'desc') {
-        data.sort((val1, val2) => (val1[sortField] < val2[sortField] ? 1 : -1));
-      }
+      data = this.filterService.sort(data, filters.sort);
     }
 
     return data;
-  }
-
-  paginateData(
-    data: CardDetails[],
-    config: Partial<PaginationConfig>
-  ): CardDetails[] {
-    const pageSize = config.pageSize || 6;
-    if (config.pageNumber) {
-      const start = (config.pageNumber - 1) * pageSize;
-      const end = start + pageSize;
-      return data.slice(start, end);
-    }
-
-    return data.slice(0, pageSize);
   }
 
   ngOnInit() {
@@ -133,6 +107,8 @@ export class AppComponent {
     this.paginatedData$ = combineLatest({
       data: this.filteredData$,
       config: this.paginationConfig$,
-    }).pipe(map(({ data, config }) => this.paginateData(data, config)));
+    }).pipe(
+      map(({ data, config }) => this.filterService.paginate(data, config))
+    );
   }
 }
