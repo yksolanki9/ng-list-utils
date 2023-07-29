@@ -7,8 +7,9 @@ import {
   distinctUntilChanged,
   map,
   shareReplay,
+  takeUntil,
 } from 'rxjs/operators';
-import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
 import { FiltersWithPageConfig } from './core/models/filters.model';
 import { DateService } from './core/services/date.service';
 import { FilterService } from './core/services/filter.service';
@@ -31,16 +32,15 @@ export class AppComponent {
 
   filtersWithPageForm: FormGroup<FiltersWithPageForm>;
 
-  filtersWithPageConfig$ = new BehaviorSubject<Partial<FiltersWithPageConfig>>({
-    search: null,
-    sort: null,
-    pageSize: 6,
-    pageNumber: 1,
-  });
+  filtersWithPageConfig$ = new BehaviorSubject<Partial<FiltersWithPageConfig>>(
+    null
+  );
 
   filteredData$: Observable<CardDetails[]>;
 
   paginatedData$: Observable<CardDetails[]>;
+
+  unsubscribeSubject$ = new Subject<void>();
 
   constructor(
     private dataService: DataService,
@@ -69,36 +69,36 @@ export class AppComponent {
     return data;
   }
 
-  ngOnInit() {
-    this.tableHeaders = this.dataService.getTableHeaders();
-
-    this.route.queryParams.subscribe((queryParams) => {
-      this.filtersWithPageConfig$.next(queryParams);
-    });
-
+  private setupFormAndSubscription() {
     this.filtersWithPageForm = new FormGroup<FiltersWithPageForm>({
       search: new FormControl(),
       sort: new FormControl(),
-      pageSize: new FormControl(6),
-      pageNumber: new FormControl(1),
+      pageSize: new FormControl(),
+      pageNumber: new FormControl(),
     });
 
+    //Changes in form values should update the query params in URL
     this.filtersWithPageForm.valueChanges
-      .pipe(debounceTime(300))
+      .pipe(takeUntil(this.unsubscribeSubject$), debounceTime(300))
       .subscribe((filters) => {
         this.router.navigate([], {
           relativeTo: this.route,
           queryParams: filters,
           queryParamsHandling: 'merge',
+          replaceUrl: true,
         });
       });
+  }
 
+  private setFilteredData() {
+    //Filter out the changes in search and sort inputs
     const searchAndSortFilters$ = this.filtersWithPageConfig$.pipe(
       distinctUntilChanged(
         (prev, curr) => prev.search === curr.search && prev.sort === curr.sort
       )
     );
 
+    //Update filteredData when the searchAndSortFilters$ emits a new value
     this.filteredData$ = combineLatest({
       data: this.getData(),
       filters: searchAndSortFilters$,
@@ -107,7 +107,10 @@ export class AppComponent {
       map((filteredData) => this.dateService.formatDate(filteredData)),
       shareReplay(1)
     );
+  }
 
+  private setPaginatedData() {
+    //Filter out the changes in pagination inputs
     const paginationConfig$ = this.filtersWithPageConfig$.pipe(
       distinctUntilChanged(
         (prev, curr) =>
@@ -115,6 +118,7 @@ export class AppComponent {
       )
     );
 
+    //Update paginatedData when filteredData changes or paginationConfig$ emits a new value
     this.paginatedData$ = combineLatest({
       data: this.filteredData$,
       config: paginationConfig$,
@@ -123,5 +127,30 @@ export class AppComponent {
         this.filterService.paginate(data, config.pageSize, config.pageNumber)
       )
     );
+  }
+
+  ngOnInit() {
+    this.setupFormAndSubscription();
+
+    //Changes in query params should trigger the BehaviourSubject
+    this.route.queryParams
+      .pipe(takeUntil(this.unsubscribeSubject$))
+      .subscribe((queryParams) => {
+        this.filtersWithPageConfig$.next(queryParams);
+
+        //Set the query param values in the form only if the form is pristine
+        if (this.filtersWithPageForm.pristine) {
+          this.filtersWithPageForm.patchValue(queryParams);
+        }
+      });
+
+    this.tableHeaders = this.dataService.getTableHeaders();
+    this.setFilteredData();
+    this.setPaginatedData();
+  }
+
+  ngOnDestroy() {
+    this.unsubscribeSubject$.next();
+    this.unsubscribeSubject$.complete();
   }
 }
