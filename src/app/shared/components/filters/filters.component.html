@@ -1,11 +1,12 @@
 <form [formGroup]="filtersWithPageForm" class="filters-container">
   <div class="filters">
-    <div>
-      <input formControlName="search" placeholder="Search"/>
+    <div class="filter-item">
+      <label>Search: </label>
+      <input formControlName="search" placeholder="Enter search string..."/>
     </div>
-    <div>
-      <label for="sort-by">Sort By: </label>
-      <select formControlName="sort" name="sort-by" id="sort-by">
+    <div class="filter-item">
+      <label>Sort By: </label>
+      <select formControlName="sort">
         <option [value]="null" selected>None</option>
         <option value="name-asc">Name (Ascending)</option>
         <option value="name-desc">Name (Descending)</option>
@@ -13,16 +14,16 @@
         <option value="dateLastEdited-desc">Date Last Edited (Descending)</option>
       </select>
     </div>
-    <div>
-      Page Size:
+    <div class="filter-item">
+      <label>Page Size: </label>
       <input class="numeric-input" formControlName="pageSize" type="number" min="1"/>
     </div>
-    <div>
-      Go to page:
+    <div class="filter-item">
+      <label>Go to page: </label>
       <input class="numeric-input" formControlName="pageNumber" type="number" min="1"/>
     </div>
   </div>
-  <div class="error">
+  <div class="error-msg">
     <div *ngIf="filtersWithPageForm.controls['pageSize'].errors">Please enter a valid Page Size.</div>
     <div *ngIf="filtersWithPageForm.controls['pageNumber'].errors as pageNumberError">
       <div *ngIf="pageNumberError.max; else genericErrorMsg">Page Number should be between 1 and {{pageNumberError.max.max}}</div>
