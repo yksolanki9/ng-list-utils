@@ -10,7 +10,7 @@ import {
   takeUntil,
 } from 'rxjs/operators';
 import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
-import { FiltersWithPageConfig } from './core/models/filters.model';
+import { FiltersWithPageConfig } from './core/models/filters-with-page-config.model';
 import { DateService } from './core/services/date.service';
 import { FilterService } from './core/services/filter.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -41,6 +41,8 @@ export class AppComponent {
   paginatedData$: Observable<CardDetails[]>;
 
   unsubscribeSubject$ = new Subject<void>();
+
+  DEFAULT_PAGE_SIZE = 6;
 
   constructor(
     private dataService: DataService,
@@ -136,11 +138,22 @@ export class AppComponent {
     this.route.queryParams
       .pipe(takeUntil(this.unsubscribeSubject$))
       .subscribe((queryParams) => {
-        this.filtersWithPageConfig$.next(queryParams);
+        const filtersWithPageConfig = {
+          ...queryParams,
+          pageSize:
+            (queryParams['pageSize'] && parseInt(queryParams['pageSize'])) ||
+            this.DEFAULT_PAGE_SIZE,
+          pageNumber:
+            (queryParams['pageNumber'] &&
+              parseInt(queryParams['pageNumber'])) ||
+            1,
+        };
+
+        this.filtersWithPageConfig$.next(filtersWithPageConfig);
 
         //Set the query param values in the form only if the form is pristine
         if (this.filtersWithPageForm.pristine) {
-          this.filtersWithPageForm.patchValue(queryParams);
+          this.filtersWithPageForm.patchValue(filtersWithPageConfig);
         }
       });
 

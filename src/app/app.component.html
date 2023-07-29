@@ -25,7 +25,14 @@
   <ng-container *ngIf="paginatedData$ | async as paginatedData">
     <app-card-grid *ngIf="paginatedData.length" [dataSource]="paginatedData"></app-card-grid>
   </ng-container>
-  <div *ngIf="filteredData$ | async as filteredData" class="table-container">
-    <app-table *ngIf="filteredData.length" [dataSource]="filteredData" [tableHeaders]="tableHeaders"></app-table>
-  </div>
+  <ng-container *ngIf="filteredData$ | async as filteredData">
+    <div *ngIf="filteredData?.length; else errorMessage" class="table-container">
+      <app-table [dataSource]="filteredData" [tableHeaders]="tableHeaders"></app-table>
+    </div>
+  </ng-container>
+  <ng-template #errorMessage>
+    <div class="error-msg">
+      Uh Oh! We couldn't find any results for your query. Please try again.
+    </div>
+  </ng-template>
 </div>
