@@ -1,23 +1,34 @@
-<form [formGroup]="filtersWithPageForm" class="controls-block">
-  <div>
-    <input formControlName="search" placeholder="Search"/>
+<form [formGroup]="filtersWithPageForm" class="filters-container">
+  <div class="filters">
+    <div>
+      <input formControlName="search" placeholder="Search"/>
+    </div>
+    <div>
+      <label for="sort-by">Sort By: </label>
+      <select formControlName="sort" name="sort-by" id="sort-by">
+        <option [value]="null" selected>None</option>
+        <option value="name-asc">Name (Ascending)</option>
+        <option value="name-desc">Name (Descending)</option>
+        <option value="dateLastEdited-asc">Date Last Edited (Ascending)</option>
+        <option value="dateLastEdited-desc">Date Last Edited (Descending)</option>
+      </select>
+    </div>
+    <div>
+      Page Size:
+      <input class="numeric-input" formControlName="pageSize" type="number" min="1"/>
+    </div>
+    <div>
+      Go to page:
+      <input class="numeric-input" formControlName="pageNumber" type="number" min="1"/>
+    </div>
   </div>
-  <div>
-    <label for="sort-by">Sort By: </label>
-    <select formControlName="sort" name="sort-by" id="sort-by">
-      <option [value]="null" selected>None</option>
-      <option value="name-asc">Name (Ascending)</option>
-      <option value="name-desc">Name (Descending)</option>
-      <option value="dateLastEdited-asc">Date Last Edited (Ascending)</option>
-      <option value="dateLastEdited-desc">Date Last Edited (Descending)</option>
-    </select>
-  </div>
-  <div>
-    Page Size:
-    <input class="numeric-input" formControlName="pageSize" type="number" min="1"/>
-  </div>
-  <div>
-    Go to page:
-    <input class="numeric-input" formControlName="pageNumber" type="number" min="1"/>
+  <div class="error">
+    <div *ngIf="filtersWithPageForm.controls['pageSize'].errors">Please enter a valid Page Size.</div>
+    <div *ngIf="filtersWithPageForm.controls['pageNumber'].errors as pageNumberError">
+      <div *ngIf="pageNumberError.max; else genericErrorMsg">Page Number should be between 1 and {{pageNumberError.max.max}}</div>
+      <ng-template #genericErrorMsg>
+        <div>Please enter a valid Page Number.</div>
+      </ng-template>
+    </div>
   </div>
 </form>

@@ -1,12 +1,15 @@
-.controls-block {
+.filters-container {
   margin: 24px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
 
-  & > div {
-    margin: 8px;
+  .filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+
+    & > div {
+      margin: 8px;
+    }
   }
 
   input,
@@ -18,5 +21,13 @@
 
   .numeric-input {
     width: 48px;
+  }
+
+  .error {
+    color: red;
+    font-style: italic;
+    text-align: center;
+    font-size: 14px;
+    padding: 4px;
   }
 }

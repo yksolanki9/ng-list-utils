@@ -43,13 +43,12 @@ export class FilterService {
     pageSize: number,
     pageNumber: number
   ): CardDetails[] {
-    const PAGE_SIZE = pageSize || 6;
     if (pageNumber) {
-      const start = (pageNumber - 1) * PAGE_SIZE;
-      const end = start + PAGE_SIZE;
+      const start = (pageNumber - 1) * pageSize;
+      const end = start + pageSize;
       return data.slice(start, end);
     }
 
-    return data.slice(0, PAGE_SIZE);
+    return data.slice(0, pageSize);
   }
 }

@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { DataService } from './core/services/data.service';
 import { CardDetails } from './core/models/card-details.model';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import {
   debounceTime,
   distinctUntilChanged,
   map,
   shareReplay,
   takeUntil,
+  tap,
 } from 'rxjs/operators';
 import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
 import { FiltersWithPageConfig } from './core/models/filters-with-page-config.model';
@@ -73,10 +74,13 @@ export class AppComponent {
 
   private setupFormAndSubscription() {
     this.filtersWithPageForm = new FormGroup<FiltersWithPageForm>({
-      search: new FormControl(),
-      sort: new FormControl(),
-      pageSize: new FormControl(),
-      pageNumber: new FormControl(),
+      search: new FormControl<string>(null),
+      sort: new FormControl<string>(null),
+      pageSize: new FormControl<number>(this.DEFAULT_PAGE_SIZE, [
+        Validators.required,
+        Validators.min(1),
+      ]),
+      pageNumber: new FormControl<number>(null, Validators.required),
     });
 
     //Changes in form values should update the query params in URL
@@ -111,6 +115,16 @@ export class AppComponent {
     );
   }
 
+  private setPageNumberValidator(numEntries: number, pageSize: number) {
+    const numPages = Math.ceil(numEntries / pageSize);
+    this.filtersWithPageForm.controls.pageNumber.setValidators([
+      Validators.required,
+      Validators.min(1),
+      Validators.max(numPages),
+    ]);
+    this.filtersWithPageForm.controls.pageNumber.updateValueAndValidity();
+  }
+
   private setPaginatedData() {
     //Filter out the changes in pagination inputs
     const paginationConfig$ = this.filtersWithPageConfig$.pipe(
@@ -125,6 +139,9 @@ export class AppComponent {
       data: this.filteredData$,
       config: paginationConfig$,
     }).pipe(
+      tap(({ data, config }) =>
+        this.setPageNumberValidator(data.length, config.pageSize)
+      ),
       map(({ data, config }) =>
         this.filterService.paginate(data, config.pageSize, config.pageNumber)
       )
