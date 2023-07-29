@@ -59,12 +59,18 @@ export class AppComponent {
 
   filterData(data: CardDetails[], filters: Partial<Filters>): CardDetails[] {
     if (filters.search) {
+      const exactSearchRegex = new RegExp('^"(.*)"$');
+      const searchString = exactSearchRegex.exec(filters.search);
+      let searchRegex: RegExp;
+      if (searchString) {
+        //Exact Match
+        searchRegex = new RegExp(searchString[1], 'i');
+      } else {
+        //Non exact match
+        searchRegex = new RegExp(filters.search.split(' ').join('.*'), 'i');
+      }
       data = data.filter((row) => {
-        const searchString = filters.search.toLowerCase();
-        return (
-          row.name.toLowerCase().includes(searchString) ||
-          row.description.toLowerCase().includes(searchString)
-        );
+        return searchRegex.test(row.name) || searchRegex.test(row.description);
       });
     }
 
