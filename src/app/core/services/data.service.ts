@@ -14,6 +14,6 @@ export class DataService {
   }
 
   getTableHeaders(): string[] {
-    return ['Name', 'Image URL', 'Description', 'Updated At'];
+    return ['Name', 'Image URL', 'Description', 'Date Last Edited'];
   }
 }
