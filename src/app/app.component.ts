@@ -15,13 +15,7 @@ import { FiltersWithPageConfig } from './core/models/filters-with-page-config.mo
 import { DateService } from './core/services/date.service';
 import { FilterService } from './core/services/filter.service';
 import { ActivatedRoute, Router } from '@angular/router';
-
-type FiltersWithPageForm = {
-  search: FormControl<string>;
-  sort: FormControl<string>;
-  pageSize: FormControl<number>;
-  pageNumber: FormControl<number>;
-};
+import { FiltersWithPageForm } from './core/models/filters-with-page-form.model';
 
 @Component({
   selector: 'app-root',

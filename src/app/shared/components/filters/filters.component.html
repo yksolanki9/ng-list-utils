@@ -7,11 +7,7 @@
     <div class="filter-item">
       <label>Sort By: </label>
       <select formControlName="sort">
-        <option [value]="null" selected>None</option>
-        <option value="name-asc">Name (Ascending)</option>
-        <option value="name-desc">Name (Descending)</option>
-        <option value="dateLastEdited-asc">Date Last Edited (Ascending)</option>
-        <option value="dateLastEdited-desc">Date Last Edited (Descending)</option>
+        <option *ngFor="let option of sortOptions" [value]="option.value">{{option.name}}</option>
       </select>
     </div>
     <div class="filter-item">

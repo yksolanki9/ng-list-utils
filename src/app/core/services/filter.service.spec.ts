@@ -83,7 +83,7 @@ fdescribe('FilterService', () => {
 
   describe('paginate(): ', () => {
     it('should return the correct result based on page size for first page', () => {
-      const result = service.paginate(cardDetails1, 3, 0);
+      const result = service.paginate(cardDetails1, 3, 1);
       expect(result).toEqual(cardDetails1.slice(0, 3));
     });
 
