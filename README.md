@@ -7,13 +7,19 @@ Table utils is an Angular web application designed to provide users with a power
 ## UI Snapshots
 
 Desktop View
-![](snapshots/desktop.png)
+<div>
+<img height="300" src="snapshots/desktop.png">
+</div>
 
 Tablet View
-![](snapshots/tablet.png)
+<div>
+<img height="300" src="snapshots/tablet.png">
+</div>
 
 Mobile View
-![](snapshots/mobile.png)
+<div>
+<img height="300" src="snapshots/mobile.png">
+</div>
 
 ## Features
 
@@ -30,7 +36,7 @@ You can access the live version of the application by visiting https://table-uti
 ## Setup
 
 - Clone the github repository in your local machine using `git clone https://github.com/yksolanki9/ng-list-utils`
-- Open the terminal and navigate to the project directory using `cd ng-list utils`
+- Open the terminal and navigate to the project directory using `cd ng-list-utils`
 - Install the required dependencies using `npm i`
 - Start the development server by running `npm start`
 - Open your web browser and visit `localhost:4200` to access the project. The application will automatically reload if you change any of the source files.
