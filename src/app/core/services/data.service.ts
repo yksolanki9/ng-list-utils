@@ -10,7 +10,8 @@ export class DataService {
   constructor(private http: HttpClient) {}
 
   getData(): Observable<CardDetails[]> {
-    return this.http.get<CardDetails[]>('assets/data/data.json');
+    const DATA_URL = 'assets/data/data.json';
+    return this.http.get<CardDetails[]>(DATA_URL);
   }
 
   getTableHeaders(): string[] {

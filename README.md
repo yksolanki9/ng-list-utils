@@ -1,27 +1,47 @@
-# AngularDashboard
+# Table Utils
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.0.4.
+## About the Project
 
-## Development server
+Table utils is an Angular web application designed to provide users with a powerful and intuitive dashboard interface for efficiently managing and analyzing data. The project incorporates various essential features such as searching, sorting, and pagination, enabling users to interact with large datasets seamlessly. The UI state is controlled by the URL, allowing easy sharing of specific data configurations. The application is also responsive, making it accessible on a wide range of devices.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## UI Snapshots
 
-## Code scaffolding
+Desktop View
+![](snapshots/desktop.png)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Tablet View
+![](snapshots/tablet.png)
 
-## Build
+Mobile View
+![](snapshots/mobile.png)
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Features
 
-## Running unit tests
+- Search for exact and flexible string matches
+- Sort fields in ascending/descending order
+- Pagination using page numbers
+- URL driven state management
+- Responsive Design
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Try it out
 
-## Running end-to-end tests
+You can access the live version of the application by visiting https://table-utils.netlify.app
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Setup
 
-## Further help
+- Clone the github repository in your local machine using `git clone https://github.com/yksolanki9/ng-list-utils`
+- Open the terminal and navigate to the project directory using `cd ng-list utils`
+- Install the required dependencies using `npm i`
+- Start the development server by running `npm start`
+- Open your web browser and visit `localhost:4200` to access the project. The application will automatically reload if you change any of the source files.
+- Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Dataset
+
+- The sample data used in this application is stored in `src/assets/data/data.json` file.
+- Feel free to modify the data in the file to test the application with different datasets.
+- Alternatively, you can change the value of `DATA_URL` variable in `src/app/core/services/data.service.ts` to fetch data from a different source.
+
+## Contact
+
+Please feel free to reach out to me at `yashsolanki1709@gmail.com` in case you have any queries.
