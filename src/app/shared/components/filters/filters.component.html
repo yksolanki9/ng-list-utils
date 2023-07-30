@@ -26,9 +26,13 @@
   <div class="error-msg">
     <div *ngIf="filtersWithPageForm.controls['pageSize'].errors">Please enter a valid Page Size.</div>
     <div *ngIf="filtersWithPageForm.controls['pageNumber'].errors as pageNumberError">
-      <div *ngIf="pageNumberError.max; else genericErrorMsg">Page Number should be between 1 and {{pageNumberError.max.max}}</div>
-      <ng-template #genericErrorMsg>
-        <div>Please enter a valid Page Number.</div>
+      <div *ngIf="pageNumberError.required || pageNumberError.min; else maxPageNumberError">
+        Please enter a valid Page Number.
+      </div>
+      <ng-template #maxPageNumberError>
+        <div *ngIf="pageNumberError.max?.max !== 0">
+            Page Number cannot be greater than {{pageNumberError.max.max}}.
+        </div>
       </ng-template>
     </div>
   </div>
