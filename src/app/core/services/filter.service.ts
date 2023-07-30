@@ -12,8 +12,15 @@ export class FilterService {
     const exactSearchString = exactSearchRegex.exec(searchString);
     let searchRegex: RegExp;
     if (exactSearchString) {
-      //Exact Match
-      searchRegex = new RegExp(exactSearchString[1], 'i');
+      //Bounded Exact Match
+      searchRegex = new RegExp(`\\b${exactSearchString[1]}\\b`, 'i');
+
+      /*
+       * The above regex is bounded, meaning if the search string is 'a', it won't match the 'a' in 'apple' but will match the 'a' in 'a dog'
+       * For an unbounded search, we can use the below regex:
+       *    searchRegex = new RegExp(${exactSearchString[1], 'i');
+       * It will match the 'a' in 'apple' as well as 'a dog'.
+       */
     } else {
       //Non exact match
       searchRegex = new RegExp(searchString.split(' ').join('.*'), 'i');

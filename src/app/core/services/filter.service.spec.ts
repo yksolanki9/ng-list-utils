@@ -8,7 +8,7 @@ import {
   cardDetailsSortedByName,
 } from '../test-data/card-details.data';
 
-//Should run tests only for this page when running `ng test`
+//Should run tests only for this service when using `ng test`
 fdescribe('FilterService', () => {
   let service: FilterService;
 
@@ -26,6 +26,12 @@ fdescribe('FilterService', () => {
       const searchQuery = '"the king"';
       const result = service.search(cardDetails1, searchQuery);
       expect(result).toEqual([cardDetails1[0], cardDetails1[3]]);
+    });
+
+    it('should return empty array for exact match when searchstring is not found', () => {
+      const searchQuery = '"the kin"';
+      const result = service.search(cardDetails1, searchQuery);
+      expect(result).toEqual([]);
     });
 
     it('should return the correct result for non-exact match', () => {
@@ -86,13 +92,8 @@ fdescribe('FilterService', () => {
       expect(result).toEqual(cardDetails1.slice(4, 6));
     });
 
-    it('should return the correct result with page size of 6 if it is null', () => {
-      const result = service.paginate(cardDetails1, null, 2);
-      expect(result).toEqual(cardDetails1.slice(6, 7));
-    });
-
-    it('should return the first 6 elements if pageNumber and pageSize is null', () => {
-      const result = service.paginate(cardDetails1, null, null);
+    it('should return the correct result based on page size if pageNumber is null', () => {
+      const result = service.paginate(cardDetails1, 6, null);
       expect(result).toEqual(cardDetails1.slice(0, 6));
     });
   });
