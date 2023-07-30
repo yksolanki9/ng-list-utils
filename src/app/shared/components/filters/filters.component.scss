@@ -1,5 +1,5 @@
 .filters-container {
-  margin: 24px 0;
+  margin: 24px 0 40px;
 
   .filters {
     display: flex;
@@ -28,13 +28,16 @@
     font-style: italic;
     text-align: center;
     font-size: 14px;
-    padding: 4px;
+    position: absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
   }
 }
 
 @media screen and (max-width: 640px) {
   .filters-container {
-    margin: 12px 0;
+    margin: 12px 0 36px;
 
     .filters {
       display: grid;
@@ -50,6 +53,9 @@
           margin-left: 6px;
         }
       }
+    }
+    .error-msg {
+      font-size: 12px;
     }
   }
 }
